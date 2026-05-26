@@ -6,11 +6,6 @@
   "framework": "vite",
   "installCommand": "npm install",
   "regions": ["iad"],
-  "functions": {
-    "api/**/*.ts": {
-      "maxDuration": 60
-    }
-  },
   "routes": [
     {
       "src": "/robots\\.txt",
