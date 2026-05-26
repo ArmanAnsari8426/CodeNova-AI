@@ -17,7 +17,18 @@ const PORT = process.env.PORT || 5000;
 app.use(helmet());
 app.use(
   cors({
-    origin: process.env.CLIENT_URL || "http://localhost:5173",
+    // Accept specific origins: localhost for dev, Vercel domain for production
+    origin: (origin, callback) => {
+      const allowed = [
+        "http://localhost:5173",
+        "https://ai-powered-coding-platform.vercel.app"
+      ];
+      if (!origin || allowed.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
     allowedHeaders: ["Content-Type", "Authorization"],
