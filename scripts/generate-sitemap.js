@@ -11,7 +11,7 @@ import { fileURLToPath } from "url";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const BASE_URL = "https://code-nova-ai.vercel.app";
+const BASE_URL = "https://ai-powered-coding-platform.vercel.app";
 
 // Define all routes with their metadata
 const routes = [
