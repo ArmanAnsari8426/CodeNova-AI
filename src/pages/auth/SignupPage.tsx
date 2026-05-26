@@ -20,7 +20,7 @@ const GitHubSvg = () => (
 export default function SignupPage() {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
-  const { loading, error, otpSent, isAuthenticated } = useAppSelector(s => s.auth);
+  const { loading, error, otpSent, isAuthenticated, devOtp } = useAppSelector(s => s.auth);
 
   const [showGoogleModal, setShowGoogleModal] = useState(false);
   const [showGithubModal, setShowGithubModal] = useState(false);
@@ -86,8 +86,8 @@ export default function SignupPage() {
   };
 
   useEffect(() => {
-    if (otpSent) navigate("/verify-otp", { state: { email: form.email } });
-  }, [otpSent, navigate, form.email]);
+    if (otpSent) navigate("/verify-otp", { state: { email: form.email, devOtp } });
+  }, [otpSent, navigate, form.email, devOtp]);
 
   useEffect(() => {
     if (isAuthenticated && !otpSent) navigate("/dashboard");

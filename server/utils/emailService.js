@@ -5,11 +5,14 @@ import { Resend } from "resend";
    https://resend.com/docs
    ══════════════════════════════════════════════════════════════ */
 
+console.log("📧 Email Service Initialization:");
+
 let resend;
 if (process.env.RESEND_API_KEY) {
   resend = new Resend(process.env.RESEND_API_KEY);
+  console.log("  Resend: ✅ Initialized with API key");
 } else {
-  console.warn("⚠️ RESEND_API_KEY is not set. Email sending is disabled.");
+  console.warn("  Resend: ❌ API_KEY is not set. Email sending is disabled.");
   resend = {
     emails: {
       send: async () => {
@@ -20,26 +23,42 @@ if (process.env.RESEND_API_KEY) {
 }
 
 const FROM = process.env.RESEND_FROM || "onboarding@resend.dev";
+console.log(`  From: ${FROM}`);
 
 /* ── Send Helper ────────────────────────────────────────────── */
 async function send({ to, subject, html }) {
   try {
+    // Validate email
+    if (!to || !subject || !html) {
+      throw new Error("Missing required email fields: to, subject, html");
+    }
+
+    // Normalize email array
+    const recipients = Array.isArray(to) ? to : [to];
+    if (recipients.length === 0) {
+      throw new Error("No recipients provided");
+    }
+
     const { data, error } = await resend.emails.send({
       from: `CodeNova AI <${FROM}>`,
-      to: Array.isArray(to) ? to : [to],
+      to: recipients,
       subject,
       html,
     });
 
     if (error) {
-      console.error("❌ Resend error:", error.message);
-      throw new Error(error.message);
+      console.error("❌ Resend API error:", JSON.stringify(error, null, 2));
+      throw new Error(`Resend error: ${error.message || JSON.stringify(error)}`);
     }
 
-    console.log(`✅ Email sent → ${to} | ID: ${data.id} | ${subject}`);
-    return { id: data.id, to, subject };
+    if (!data?.id) {
+      console.warn("⚠️ Email sent but no ID returned");
+    }
+
+    console.log(`✅ Email sent → ${recipients.join(", ")} | ID: ${data?.id} | ${subject}`);
+    return { id: data?.id, to: recipients, subject };
   } catch (err) {
-    console.error(`❌ Email failed → ${to}:`, err.message);
+    console.error(`❌ Email failed for ${to}:`, err.message);
     throw err;
   }
 }

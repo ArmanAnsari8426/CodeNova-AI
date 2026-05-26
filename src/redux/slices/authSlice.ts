@@ -29,6 +29,7 @@ export interface AuthState {
   success: string | null;
   otpSent: boolean;
   otpEmail: string | null;
+  devOtp: string | null;
   passwordResetToken: string | null;
   rememberMe: boolean;
 }
@@ -163,6 +164,7 @@ const initialState: AuthState = {
   success: null,
   otpSent: false,
   otpEmail: null,
+  devOtp: null,
   passwordResetToken: null,
   rememberMe: safeGet("cn_remember") === "true",
 };
@@ -207,7 +209,7 @@ export const signupThunk = createAsyncThunk(
       });
 
       const token = result?.session?.access_token || makeToken(user);
-      return { user, token, remember: payload.remember };
+      return { user, token, remember: payload.remember, devOtp: result?.devOtp || null };
     } catch (err: any) {
       if (!navigator.onLine || err?.code === "ERR_NETWORK") {
         await delay(900);
@@ -223,7 +225,7 @@ export const signupThunk = createAsyncThunk(
           isVerified: false,
           createdAt: new Date().toISOString(),
         };
-        return { user, token: makeToken(user), remember: payload.remember };
+        return { user, token: makeToken(user), remember: payload.remember, devOtp: null };
       }
       return rejectWithValue(getErrMsg(err, "Registration failed."));
     }
@@ -315,12 +317,12 @@ export const sendOtpThunk = createAsyncThunk(
     { rejectWithValue }
   ) => {
     try {
-      await authAPI.sendOtp(payload.email, payload.purpose);
-      return payload.email;
+      const result: any = await authAPI.sendOtp(payload.email, payload.purpose);
+      return { email: payload.email, devOtp: result?.devOtp || null };
     } catch (err: any) {
       if (!navigator.onLine || err?.code === "ERR_NETWORK") {
         await delay(700);
-        return payload.email;
+        return { email: payload.email, devOtp: null };
       }
       return rejectWithValue(getErrMsg(err, "Failed to send OTP."));
     }
@@ -353,7 +355,7 @@ export const resetPasswordThunk = createAsyncThunk(
     { rejectWithValue }
   ) => {
     try {
-      await authAPI.resetPassword(payload.newPassword);
+      await authAPI.resetPassword(payload.email, payload.newPassword);
       return true;
     } catch (err: any) {
       if (!navigator.onLine || err?.code === "ERR_NETWORK") {
@@ -417,7 +419,7 @@ const authSlice = createSlice({
   reducers: {
     clearError(state) { state.error = null; },
     clearSuccess(state) { state.success = null; },
-    clearOtpState(state) { state.otpSent = false; state.otpEmail = null; },
+    clearOtpState(state) { state.otpSent = false; state.otpEmail = null; state.devOtp = null; },
     setRememberMe(state, action: PayloadAction<boolean>) { state.rememberMe = action.payload; },
     updateProfileLocal(state, action: PayloadAction<Partial<User>>) {
       if (state.user) {
@@ -449,6 +451,7 @@ const authSlice = createSlice({
         s.isAuthenticated = false;
         s.otpSent = true;
         s.otpEmail = a.payload.user.email;
+        s.devOtp = a.payload.devOtp;
         s.success = "Account created! Please verify your email with the OTP we sent.";
         persistAuth(a.payload.remember, a.payload.user, a.payload.token);
       })
@@ -489,8 +492,9 @@ const authSlice = createSlice({
       .addCase(sendOtpThunk.fulfilled, (s, a) => {
         s.loading = false;
         s.otpSent = true;
-        s.otpEmail = a.payload;
-        s.success = `OTP sent to ${a.payload}. Check your inbox!`;
+        s.otpEmail = a.payload.email;
+        s.devOtp = a.payload.devOtp;
+        s.success = `OTP sent to ${a.payload.email}. Check your inbox!`;
       })
       .addCase(sendOtpThunk.rejected, (s, a) => {
         s.loading = false;
@@ -502,6 +506,7 @@ const authSlice = createSlice({
         s.loading = false;
         if (s.user) s.user.isVerified = true;
         s.isAuthenticated = true;
+        s.devOtp = null;
         s.success = "Email verified successfully!";
       })
       .addCase(verifyOtpThunk.rejected, (s, a) => {
@@ -515,6 +520,7 @@ const authSlice = createSlice({
         s.success = "Password reset successfully! You can now sign in with your new password.";
         s.otpSent = false;
         s.otpEmail = null;
+        s.devOtp = null;
       })
       .addCase(resetPasswordThunk.rejected, (s, a) => {
         s.loading = false;
@@ -529,6 +535,7 @@ const authSlice = createSlice({
         s.success = null;
         s.otpSent = false;
         s.otpEmail = null;
+        s.devOtp = null;
       })
 
       .addCase(updateProfileThunk.pending, (s) => {

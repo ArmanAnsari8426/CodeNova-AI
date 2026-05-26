@@ -68,17 +68,20 @@ export const authAPI = {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email, purpose }),
     });
-    return res.json();
+    const json = await res.json();
+    if (!res.ok) throw json;
+    return json;
   },
 
   async verifyOtp(email: string, otp: string) {
-    const { data, error } = await supabase.auth.verifyOtp({
-      email,
-      token: otp,
-      type: "email",
+    const res = await fetch(`${import.meta.env.VITE_API_BASE_URL || "http://localhost:5000/api/v1"}/auth/verify-otp`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, otp }),
     });
-    if (error) throw error;
-    return data;
+    const json = await res.json();
+    if (!res.ok) throw json;
+    return json;
   },
 
   async forgotPassword(email: string) {
@@ -90,10 +93,15 @@ export const authAPI = {
     return res.json();
   },
 
-  async resetPassword(newPassword: string) {
-    const { data, error } = await supabase.auth.updateUser({ password: newPassword });
-    if (error) throw error;
-    return data;
+  async resetPassword(email: string, newPassword: string) {
+    const res = await fetch(`${import.meta.env.VITE_API_BASE_URL || "http://localhost:5000/api/v1"}/auth/reset-password`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, newPassword }),
+    });
+    const json = await res.json();
+    if (!res.ok) throw json;
+    return json;
   },
 
   async logout() {

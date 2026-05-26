@@ -10,11 +10,12 @@ export default function VerifyOtpPage() {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const location = useLocation();
-  const { loading, error, isAuthenticated } = useAppSelector(s => s.auth);
+  const { loading, error, isAuthenticated, devOtp: storedDevOtp } = useAppSelector(s => s.auth);
 
-  const state = location.state as { email?: string; purpose?: "signup" | "reset" } | null;
+  const state = location.state as { email?: string; purpose?: "signup" | "reset"; devOtp?: string | null } | null;
   const email = state?.email || "";
   const purpose = state?.purpose || "signup";
+  const devOtp = state?.devOtp || storedDevOtp;
 
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
   const [countdown, setCountdown] = useState(60);
@@ -92,6 +93,13 @@ export default function VerifyOtpPage() {
     }
   };
 
+  const fillDevOtp = () => {
+    if (!devOtp) return;
+    const digits = devOtp.replace(/\D/g, "").slice(0, 6).split("");
+    setOtp(Array.from({ length: 6 }, (_, i) => digits[i] || ""));
+    if (digits.length === 6) handleSubmit(digits.join(""));
+  };
+
   const handleResend = () => {
     dispatch(sendOtpThunk({ email, purpose: "verification" }));
     setCountdown(60);
@@ -122,6 +130,16 @@ export default function VerifyOtpPage() {
           <p className="text-white font-medium text-sm flex items-center justify-center gap-1.5 mt-1">
             <Mail className="w-3.5 h-3.5" /> {email}
           </p>
+
+          {devOtp && (
+            <button
+              type="button"
+              onClick={fillDevOtp}
+              className="mt-4 w-full rounded-xl border border-emerald-400/30 bg-emerald-500/10 px-3 py-2 text-sm text-emerald-100 hover:bg-emerald-500/15 transition"
+            >
+              Development OTP: <span className="font-mono font-bold tracking-widest">{devOtp}</span>
+            </button>
+          )}
 
           <AnimatePresence>
             {error && (

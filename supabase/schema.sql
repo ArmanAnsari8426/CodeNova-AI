@@ -36,10 +36,53 @@ before update on public.profiles
 for each row
 execute function public.handle_updated_at();
 
--- 4) Automatically create a profile when auth.users gets a new user
+-- 4) OTP Storage Table
+create table if not exists public.otps (
+  id uuid primary key default uuid_generate_v4(),
+  email text not null,
+  code text not null,
+  purpose text not null check (purpose in ('verification', 'reset')),
+  expires_at timestamptz not null,
+  created_at timestamptz not null default now(),
+  constraint otps_email_purpose unique (email, purpose)
+);
+
+-- Index for faster lookups
+create index if not exists idx_otps_email on public.otps(email);
+create index if not exists idx_otps_expires_at on public.otps(expires_at);
+
+-- Auto-delete expired OTPs (cleanup)
+create or replace function public.cleanup_expired_otps()
+returns void as $$
+begin
+  delete from public.otps where expires_at < now();
+end;
+$$ language plpgsql;
+
+-- 5) Automatically create a profile when auth.users gets a new user
 create or replace function public.handle_new_user()
 returns trigger as $$
+declare
+  desired_username text;
+  username_to_use text;
+  counter integer := 0;
 begin
+  desired_username := coalesce(
+    new.raw_user_meta_data->>'username',
+    split_part(new.email, '@', 1)
+  );
+
+  username_to_use := desired_username;
+
+  -- Handle username collisions by appending random digits
+  while exists (select 1 from public.profiles where username = username_to_use) loop
+    counter := counter + 1;
+    username_to_use := desired_username || floor(random() * 1000)::text;
+    if counter > 100 then
+      raise exception 'Unable to generate unique username after 100 attempts';
+    end if;
+  end loop;
+
   insert into public.profiles (
     id,
     full_name,
@@ -53,10 +96,7 @@ begin
   ) values (
     new.id,
     coalesce(new.raw_user_meta_data->>'full_name', ''),
-    coalesce(
-      new.raw_user_meta_data->>'username',
-      split_part(new.email, '@', 1)
-    ),
+    username_to_use,
     new.email,
     coalesce(new.raw_user_meta_data->>'avatar_url', null),
     coalesce(new.raw_user_meta_data->>'phone', null),
