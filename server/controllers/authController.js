@@ -209,6 +209,11 @@ export async function signup(req, res) {
 
     console.log(`✅ User created in auth: ${authData.user?.id}`);
 
+    // Generate and send OTP
+    const otp = generateOtp();
+    await saveOtp(email, otp, "signup");
+    await sendOtpEmail(email, otp, "signup");
+
     // Create profile with correct fullName mapping
     if (authData.user) {
       try {
@@ -238,43 +243,6 @@ export async function signup(req, res) {
   }
 }
 
-export async function verifyOtp(req, res) {
-  try {
-    const { email, otp } = req.body;
-
-    if (!email || !otp) {
-      return res.status(400).json({ error: "Missing email or OTP" });
-    }
-
-    const { data: verifyData, error: verifyError } = await supabasePublic.auth.verifyOtp({
-      email,
-      token: otp,
-      type: "signup",
-    });
-
-    if (verifyError) {
-      console.warn(`Supabase signup OTP failed: ${verifyError.message}`);
-      return res.status(400).json({ error: verifyError.message || "Invalid or expired OTP" });
-    }
-
-    if (supabaseAdmin) {
-      try {
-        await supabaseAdmin.from("profiles").update({ is_verified: true }).eq("email", email);
-      } catch (profileErr) {
-        console.warn(`Could not update profile: ${profileErr.message}`);
-      }
-    }
-
-    res.json({
-      message: "Email verified successfully!",
-      user: verifyData.user,
-      session: verifyData.session,
-    });
-  } catch (err) {
-    console.error("❌ OTP verification error:", err);
-    res.status(400).json({ error: err.message });
-  }
-}
 
 export async function sendOtpController(req, res) {
   try {
