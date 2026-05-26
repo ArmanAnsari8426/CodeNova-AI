@@ -21,7 +21,8 @@ app.use(
     origin: (origin, callback) => {
       const allowed = [
         "http://localhost:5173",
-        "https://ai-powered-coding-platform.vercel.app"
+        "https://ai-powered-coding-platform.vercel.app",
+        "https://code-nova-ai.vercel.app"
       ];
       if (!origin || allowed.includes(origin)) {
         callback(null, true);
