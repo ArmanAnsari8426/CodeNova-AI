@@ -1,0 +1,35 @@
+# AI-Powered Coding Platform - robots.txt
+# Allow all search engines to crawl the website
+
+User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /api/
+Disallow: /private/
+Disallow: /*.json$
+Disallow: /.env
+
+# Specific rules for Google
+User-agent: Googlebot
+Allow: /
+Crawl-delay: 0
+
+# Specific rules for Bing
+User-agent: Bingbot
+Allow: /
+Crawl-delay: 1
+
+# Block bad bots
+User-agent: AhrefsBot
+User-agent: SemrushBot
+User-agent: DotBot
+User-agent: MJ12bot
+Disallow: /
+
+# Sitemap location
+Sitemap: https://ai-powered-coding-platform.vercel.app/sitemap.xml
+Sitemap: https://ai-powered-coding-platform.vercel.app/sitemap-mobile.xml
+
+# Cache settings (in seconds)
+# Crawl-delay: 1
+# Request-rate: 30/1m
