@@ -17,7 +17,7 @@ async function upsertProfile(profile: any) {
 
 export const authAPI = {
   async signup(data: any) {
-    const res = await fetch(`${import.meta.env.VITE_API_BASE_URL || "http://localhost:5000/api/v1"}/auth/signup`, {
+    const res = await fetch(`${import.meta.env.VITE_API_URL}/auth/signup`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -63,7 +63,7 @@ export const authAPI = {
 
   async sendOtp(email: string, purpose?: string) {
     // We will send OTP via Resend from backend
-    const res = await fetch(`${import.meta.env.VITE_API_BASE_URL || "http://localhost:5000/api/v1"}/auth/send-otp`, {
+    const res = await fetch(`${import.meta.env.VITE_API_URL}/auth/send-otp`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email, purpose }),
@@ -74,7 +74,7 @@ export const authAPI = {
   },
 
   async verifyOtp(email: string, otp: string) {
-    const res = await fetch(`${import.meta.env.VITE_API_BASE_URL || "http://localhost:5000/api/v1"}/auth/verify-otp`, {
+    const res = await fetch(`${import.meta.env.VITE_API_URL}/auth/verify-otp`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email, otp }),
@@ -85,7 +85,7 @@ export const authAPI = {
   },
 
   async forgotPassword(email: string) {
-    const res = await fetch(`${import.meta.env.VITE_API_BASE_URL || "http://localhost:5000/api/v1"}/auth/forgot-password`, {
+    const res = await fetch(`${import.meta.env.VITE_API_URL}/auth/forgot-password`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email }),
@@ -94,7 +94,7 @@ export const authAPI = {
   },
 
   async resetPassword(email: string, newPassword: string) {
-    const res = await fetch(`${import.meta.env.VITE_API_BASE_URL || "http://localhost:5000/api/v1"}/auth/reset-password`, {
+    const res = await fetch(`${import.meta.env.VITE_API_URL}/auth/reset-password`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email, newPassword }),
