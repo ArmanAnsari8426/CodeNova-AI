@@ -114,6 +114,27 @@ export default function AboutPage() {
             </div>
           </div>
         </div>
+
+        {/* Creator Credit Section */}
+        <div className="mt-20 text-center">
+          <div className="glass rounded-3xl p-8 border border-white/10 inline-block">
+            <p className="text-nova-muted text-sm mb-2">This platform was created by</p>
+            <a
+              href="https://armanansari8426.github.io/Arman-portfolio/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 text-2xl font-display font-extrabold gradient-text hover:opacity-80 transition"
+            >
+              Arman Ansari
+              <svg className="w-5 h-5 text-violet-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4m-4-4l-8 8m0 0l4-4m-4 4l4 4" />
+              </svg>
+            </a>
+            <p className="text-nova-muted text-xs mt-3">
+              Software Engineer | Full-Stack Developer | Building AI-Powered Education Platform
+            </p>
+          </div>
+        </div>
       </div>
     </div>
   );

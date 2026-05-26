@@ -853,6 +853,33 @@ export default function Landing() {
         </div>
       </Section>
 
+      {/* ═══════════ CREATOR CREDIT ═══════════ */}
+      <Section className="py-12">
+        <div className="text-center">
+          <div className="glass rounded-3xl p-8 border border-white/10 inline-block max-w-lg">
+            <p className="text-nova-muted text-sm mb-3">Created with passion by</p>
+            <a
+              href="https://armanansari8426.github.io/Arman-portfolio/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2.5 group"
+            >
+              <div className="w-12 h-12 rounded-full bg-gradient-to-br from-violet-500 to-fuchsia-500 flex items-center justify-center text-white font-bold shadow-lg">
+                AA
+              </div>
+              <div className="text-left">
+                <div className="text-xl font-display font-extrabold gradient-text group-hover:opacity-80 transition">
+                  Arman Ansari
+                </div>
+                <div className="text-xs text-nova-muted group-hover:text-white transition">
+                  Full-Stack Developer • View Portfolio →
+                </div>
+              </div>
+            </a>
+          </div>
+        </div>
+      </Section>
+
       {/* ═══════════ FINAL CTA ═══════════ */}
       <section className="relative py-24 overflow-hidden">
         <FloatingParticles />

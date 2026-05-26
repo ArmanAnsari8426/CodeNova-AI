@@ -95,9 +95,25 @@ export function Footer() {
         </div>
 
         <div className="mt-16 pt-8 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left">
-          <p className="text-xs text-nova-muted font-sans max-w-md">
-            © 2026 CodeNova AI, Inc. Crafted with caffeine, GPU cycles, and a love for clean code. All rights reserved.
-          </p>
+          <div className="space-y-2">
+            <p className="text-xs text-nova-muted font-sans max-w-md">
+              © 2026 CodeNova AI, Inc. Crafted with caffeine, GPU cycles, and a love for clean code. All rights reserved.
+            </p>
+            <p className="text-xs text-nova-muted/70 font-sans">
+              Created by{" "}
+              <a
+                href="https://armanansari8426.github.io/Arman-portfolio/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-violet-400 hover:text-violet-300 font-semibold transition inline-flex items-center gap-1"
+              >
+                Arman Ansari
+                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4m-4-4l-8 8m0 0l4-4m-4 4l4 4" />
+                </svg>
+              </a>
+            </p>
+          </div>
           <div className="flex items-center gap-3 text-xs text-nova-muted font-mono bg-white/5 px-4 py-2 rounded-xl border border-white/10 shadow-inner">
             <Link to="/status" className="inline-flex items-center gap-2 hover:text-white transition">
               <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shadow-lg shadow-emerald-400" />
